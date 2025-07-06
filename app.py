@@ -1,14 +1,31 @@
-from flask import Flask
+from flask import Flask, request, render_template
+import pandas as pd
+import logging
+import datetime
+# Import models from the separate module
+from mlops.demo import get_initial_page, get_data, load_models
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+load_models()
+index_file = "index.html"
+# Initialize Flask
+
 app = Flask(__name__)
-import os
-
-
-port = int(os.environ.get("PORT", 5000))
-
 @app.route("/")
 def home():
-    return "Hello from Railway!"
+    return render_template(index_file)
 
+@app.route("/titanic_demo")
+def demo_page():
+    return get_initial_page()
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=port)
+@app.route('/titanic_demo/data', methods = ['POST'])
+def data():
+  startime = datetime.datetime.now()
+  form_data = request.form
+  page = get_data(form_data)
+  endtime = datetime.datetime.now()
+  print("loading debug - handling data took " + str(endtime - startime))
+  return page
