@@ -1,15 +1,23 @@
-from flask import Flask
+from flask import Flask, render_template, request
 app = Flask(__name__)
 import os
-
-
+import requests
+from titanic_demo import get_initial_page, get_data
+from mlops.library import *
+index_path = "index.html"
 
 
 @app.route("/")
 def home():
-    return "Hello from Railway!"
+    return render_template(index_path)
+
+@app.route("/titanic_demo")
+def demo_page():
+    return get_initial_page()
+
+@app.route('/titanic_demo/data', methods = ['POST'])
+def data():
+  form_data = request.form
+  return get_data(form_data)
 
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
