@@ -5,6 +5,5 @@ tensorflow
 scikit-learn
 lightgbm
 pandas
-pickle
 dill
 lime
