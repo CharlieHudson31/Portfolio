@@ -64,9 +64,12 @@ with open(f"{model_path}/pipeline-documentation.md", 'r', encoding='utf-8') as f
 config = get_dataset_config()
 print("loading debug - got config", flush=True)
 pipeline_docs_html = get_pipeline_documentation(pipe_md_content)
+print("loading debug - got pipeline.md", flush=True)
 lgb_table = lgb_thresholds.to_html(index=False, justify='center').replace('<td>','<td style="text-align: center;">')
+print("loading debug - got lgb table", flush=True)
 logreg_table = logreg_thresholds.to_html(index=False, justify='center').replace('<td>','<td style="text-align: center;">')
 knn_table = knn_thresholds.to_html(index=False, justify='center').replace('<td>', '<td style="text-align: center;">')
+print("loading debug - one more table left", flush=True)
 ann_table = ann_thresholds.to_html(index=False, justify='center').replace('<td>', '<td style="text-align: center;">')
 logging.debug("Done loading")
 """
