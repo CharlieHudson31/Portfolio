@@ -71,7 +71,7 @@ logreg_table = logreg_thresholds.to_html(index=False, justify='center').replace(
 knn_table = knn_thresholds.to_html(index=False, justify='center').replace('<td>', '<td style="text-align: center;">')
 print("loading debug - one more table left", flush=True)
 ann_table = ann_thresholds.to_html(index=False, justify='center').replace('<td>', '<td style="text-align: center;">')
-logging.debug("Done loading")
+print("loading debug - got all tables", flush=True)
 """
 return {
     "config": config,
@@ -89,7 +89,7 @@ return {
 }
 """
 fpage = create_template_page(config, fpage_template, pipeline_docs_html, lgb_table, logreg_table, knn_table, ann_table)
-
+print("loading debug - created template", flush=True)
 def get_initial_page():
   return create_page(fpage, lgb='', knn='', logreg='', ann='', ensemble='', row_data='',
                           lgb_lime_table='',
@@ -107,7 +107,7 @@ def get_data(form_data):
   logreg = np.round(yhat_logreg[0], 2)
   ann = np.round(yhat_ann[0], 2)
   ensemble = np.round(ensemble, 2)
-
+  print("loading debug - handled data", flush=True)
   #handle lime stuff
   lgb_lime_table = ''
   logreg_lime_table = ''
@@ -143,7 +143,7 @@ def get_data(form_data):
     except Exception as e:
       ann_lime_table = f"Error generating ANN LIME: {e}"
       pass
-
+  print("loading debug - got explainers", flush=True)
   #fill in fpage with results from models and Lime
   return create_page(fpage, lgb=lgb, knn=knn, logreg=logreg, ann=ann, ensemble=ensemble, row_data=str(form_data.to_dict()),
                            lgb_lime_table=lgb_lime_table,
@@ -152,7 +152,7 @@ def get_data(form_data):
                            ann_lime_table = ann_lime_table
                            )
 
-
+print("loading debug - done loading", flush=True)
 
 
 

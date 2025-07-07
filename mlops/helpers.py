@@ -1055,6 +1055,7 @@ def create_page(page, **fillers):
   new_page = page[:]  #copy
   for k,v in fillers.items():
     new_page = new_page.replace(f'%{str(k)}%', str(v))
+  print("loading debug - returning new_page", flush=True)
   return new_page
 
 def create_template_page(config, fpage_template, pipeline_docs_html, lgb_table, logreg_table, knn_table, ann_table):
