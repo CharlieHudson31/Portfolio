@@ -2,9 +2,9 @@ from joblib import load
 from flask import Flask
 from flask import request
 import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # disable GPU
 import tensorflow as tf
 print("hi", flush=True)
-import os
 import requests
 from joblib import load
 import logging
@@ -16,6 +16,7 @@ import pickle
 import sys
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 sys.modules['__main__'].CustomMappingTransformer = CustomMappingTransformer
 sys.modules['__main__'].CustomTargetTransformer = CustomTargetTransformer
@@ -64,7 +65,7 @@ lgb_table = lgb_thresholds.to_html(index=False, justify='center').replace('<td>'
 logreg_table = logreg_thresholds.to_html(index=False, justify='center').replace('<td>','<td style="text-align: center;">')
 knn_table = knn_thresholds.to_html(index=False, justify='center').replace('<td>', '<td style="text-align: center;">')
 ann_table = ann_thresholds.to_html(index=False, justify='center').replace('<td>', '<td style="text-align: center;">')
-
+logging.debug("Done loading")
 """
 return {
     "config": config,
