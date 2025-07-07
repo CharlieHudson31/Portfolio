@@ -37,7 +37,7 @@ from sklearn.model_selection import HalvingGridSearchCV
 from sklearn.model_selection import ParameterGrid
 import joblib
 import datetime
-from tensorflow.keras.models import load_model
+
 """
 ^Usage:
 param_grid = ParameterGrid(knn_grid)  #a list of dictionaries, one for each combo
