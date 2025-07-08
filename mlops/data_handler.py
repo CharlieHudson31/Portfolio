@@ -4,6 +4,8 @@ import numpy as np
 #I probably should pass all the models in but I'm using them as globals. My bad. Being lazy.
 import titanic_demo
 from mlops.library import *
+from datetime import datetime
+
 
 def get_prediction(row):
 
@@ -63,7 +65,7 @@ def handle_data(columns, fitted_transformer, config, column_order):
     tuple
         (transformed_row, yhat_lgb, yhat_knn, yhat_logreg, yhat_ann)
     """
-
+    startime = datetime.now()
     # Create DataFrame with columns in the expected order
     row_df = pd.DataFrame(columns=column_order)
     row_df.loc[0] = np.nan  # Add blank row
@@ -87,7 +89,8 @@ def handle_data(columns, fitted_transformer, config, column_order):
 
     # Get predictions
     yhat_lgb, yhat_knn, yhat_logreg, yhat_ann = get_prediction(new_row)
-
+    end_time = datetime.now()
+    print("loading debug - handling data took " + (end_time - startime))
     return new_row, yhat_lgb, yhat_knn, yhat_logreg, yhat_ann
 
 
