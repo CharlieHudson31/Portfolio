@@ -3,7 +3,6 @@ gunicorn
 joblib
 tensorflow-cpu
 scikit-learn==1.6.1
-lightgbm
 pandas
 dill
 lime

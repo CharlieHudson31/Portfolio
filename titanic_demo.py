@@ -12,7 +12,7 @@ import pandas as pd
 from mlops.library import *
 from mlops.helpers import *
 from mlops.data_handler import *
-import pickle
+import dill
 import sys
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -38,9 +38,9 @@ ann_model_path = f"{model_path}/{ann_model_name}"
 # Load model
 print("got model paths", flush=True)
 
-lgb_model = load(lgb_model_path)
-logreg_model = load(logreg_model_path)
-knn_model = load(knn_model_path)
+lgb_model = joblib.load(lgb_model_path)
+logreg_model = joblib.load(logreg_model_path)
+knn_model = joblib.load(knn_model_path)
 
 print("past keras loading", flush=True)
 ann_model = tf.keras.models.load_model(ann_model_path, custom_objects={'LeakyReLU': tf.keras.layers.LeakyReLU()})
@@ -50,12 +50,12 @@ lgb_thresholds = pd.read_csv(f'{model_path}/lgb_thresholds.csv').round(2)
 ann_thresholds = pd.read_csv(f'{model_path}/ann_thresholds.csv').round(2)
 print("done reading cvs - loading debug", flush=True)
 # Load fitted transformer
-fitted_transformer = load(f"{model_path}/final_fully_fitted_pipeline.pkl")
+fitted_transformer = joblib.load(f"{model_path}/final_fully_fitted_pipeline.pkl")
 joblib.dump(fitted_transformer, "final_fully_fitted_pipeline.pkl") # __main__.CustomMappingTransformer 
 #must now become mlops.library.CustomMappingTransformer in the pickle file
 print("dumped transformer", flush=True)
 with open(f"{model_path}/lime_explainer.pkl", 'rb') as file:
-    lime_explainer = pickle.load(file)
+    lime_explainer = dill.load(file)
 
 with open(f"{model_path}/pipeline-documentation.md", 'r', encoding='utf-8') as file:
     pipe_md_content = file.read()
