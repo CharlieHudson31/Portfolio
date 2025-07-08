@@ -7,4 +7,3 @@ lightgbm
 pandas
 dill
 lime
-sklearn

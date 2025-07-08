@@ -4,6 +4,7 @@ import os
 import requests
 from titanic_demo import get_initial_page, get_data
 from mlops.library import *
+from datetime import datetime
 index_path = "index.html"
 
 
@@ -17,7 +18,11 @@ def demo_page():
 
 @app.route('/titanic_demo/data', methods = ['POST'])
 def data():
+  startime = datetime.now()
   form_data = request.form
-  return get_data(form_data)
+  page = get_data(form_data)
+  endtime = datetime.now()
+  print("loading debug - handling data took " + str(endtime - startime))
+  return page
 
 

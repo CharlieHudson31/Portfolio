@@ -90,7 +90,7 @@ def handle_data(columns, fitted_transformer, config, column_order):
     # Get predictions
     yhat_lgb, yhat_knn, yhat_logreg, yhat_ann = get_prediction(new_row)
     end_time = datetime.now()
-    print("loading debug - handling data took " + (end_time - startime))
+    print("loading debug - handling data took " + str(end_time - startime))
     return new_row, yhat_lgb, yhat_knn, yhat_logreg, yhat_ann
 
 
