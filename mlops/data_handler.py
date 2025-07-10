@@ -32,11 +32,6 @@ def get_prediction(row):
 
   return [yhat_lgb, yhat_knn, yhat_logreg, yhat_ann]
 
-def ann_proba(rows):
-  yhat = titanic_demo.ann_model.predict(rows)
-  result = [[1.0-p[0],p[0]] for p in yhat]  #wrangle into proba form
-  x = np.array(result)
-  return x
 
 #Helper function to build dataframe for Lime results - use as is
 def create_lime_table(the_explainer):
