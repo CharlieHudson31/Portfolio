@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 import dill
 from helpers import *
 import numpy as np
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent
 feature_names = ['person_age', 'person_gender', 'person_education', 'person_income', 'person_emp_exp', 'person_home_ownership', 'loan_amnt', 'loan_intent', 'loan_int_rate', 'loan_percent_income', 'cb_person_cred_hist_length', 'credit_score','previous_loan_defaults_on_file']
 model_path = "mlops_v2"
 lgb_model_name = 'lgb_model.joblib'
@@ -25,8 +27,9 @@ logreg_model_path = f"{logreg_model_name}"
 knn_model_path = f"{knn_model_name}"
 ann_model_path = f"{ann_model_name}"
 
-
-
+for file_path in [lgb_model_path, logreg_model_path, knn_model_path, ann_model_path]:
+  this_path = Path(file_path)
+  assert this_path.exists()
 """
 logreg_model = joblib.load(logreg_model_path)
 knn_model = joblib.load(knn_model_path)
