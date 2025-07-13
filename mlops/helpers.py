@@ -13,52 +13,6 @@ def create_lime_table(the_explainer):
     df.loc[i] = [row[0],the_probs,row[1]]
   return df
 
-def handle_data(columns, fitted_transformer, config, column_order):
-    """
-    Process form data using the dataset configuration.
-
-    Parameters:
-    -----------
-    columns : dict
-        Dictionary containing form field values, with field names as keys
-    fitted_transformer : Pipeline
-        Fitted sklearn Pipeline for transforming the input data
-    config : dict
-        Dataset configuration from get_dataset_config()
-
-    Returns:
-    --------
-    tuple
-        (transformed_row, yhat_lgb, yhat_knn, yhat_logreg, yhat_ann)
-    """
-    startime = datetime.now()
-    # Create DataFrame with columns in the expected order
-    row_df = pd.DataFrame(columns=column_order)
-    row_df.loc[0] = np.nan  # Add blank row
-    # Process form values and fill the DataFrame
-    for field_id, field_config in config.items():
-        form_field = field_config["form_field"]
-        column_name = field_config["column_name"]
-
-        if form_field in columns and column_name in row_df.columns:
-            # Apply the field's processing function and assign to the correct column
-            processed_value = field_config["process"](columns[form_field])
-            row_df.loc[0, column_name] = processed_value
-
-    # Run pipeline
-    row_transformed = fitted_transformer.transform(row_df)
-
-    # Grab added row
-    new_row = row_transformed.loc[0].to_list()
-    new_row = np.array(new_row)
-    new_row = np.reshape(new_row, (1,-1)) if len(new_row.shape)==1 else new_row
-
-    # Get predictions
-    yhat_lgb, yhat_knn, yhat_logreg, yhat_ann = get_prediction(new_row)
-    end_time = datetime.now()
-    print("loading debug - handling data took " + str(end_time - startime))
-    return new_row, yhat_lgb, yhat_knn, yhat_logreg, yhat_ann
-
 def get_dataset_config():
   """
   Centralized configuration for Bank Loan dataset fields.

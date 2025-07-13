@@ -1,10 +1,10 @@
 from flask import Flask, request, render_template
 import pandas as pd
 import logging
-
+import datetime
 # Import models from the separate module
-from mlops_v2 import test
-from mlops_v2 import helpers
+from mlops.test import get_initial_page, get_data
+
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,13 +18,13 @@ def home():
 
 @app.route("/titanic_demo")
 def demo_page():
-    return get_initial_page(fpage, my_data["config"], my_data["pipeline_docs_html"], my_data["lgb_table"], my_data["logreg_model"], my_data["knn_table"], my_data["ann_table"])
+    return get_initial_page()
 
 @app.route('/titanic_demo/data', methods = ['POST'])
 def data():
-  startime = datetime.now()
+  startime = datetime.datetime.now()
   form_data = request.form
-  page = get_data(form_data, my_data["fpage"])
-  endtime = datetime.now()
+  page = get_data(form_data)
+  endtime = datetime.datetime.now()
   print("loading debug - handling data took " + str(endtime - startime))
   return page

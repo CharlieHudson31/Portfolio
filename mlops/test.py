@@ -12,20 +12,20 @@ import sys
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 import dill
-from helpers import *
+from mlops.helpers import *
 import numpy as np
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 feature_names = ['person_age', 'person_gender', 'person_education', 'person_income', 'person_emp_exp', 'person_home_ownership', 'loan_amnt', 'loan_intent', 'loan_int_rate', 'loan_percent_income', 'cb_person_cred_hist_length', 'credit_score','previous_loan_defaults_on_file']
-model_path = "mlops_v2"
+model_path = "mlops"
 lgb_model_name = 'lgb_model.joblib'
 logreg_model_name = 'logreg_model.joblib'
 knn_model_name = 'knn_model.joblib'
 ann_model_name = 'ann_model.keras'
-lgb_model_path = f"{lgb_model_name}"
-logreg_model_path = f"{logreg_model_name}"
-knn_model_path = f"{knn_model_name}"
-ann_model_path = f"{ann_model_name}"
+lgb_model_path = f"{model_path}/{lgb_model_name}"
+logreg_model_path = f"{model_path}/{logreg_model_name}"
+knn_model_path = f"{model_path}/{knn_model_name}"
+ann_model_path = f"{model_path}/{ann_model_name}"
 
 for file_path in [lgb_model_path, logreg_model_path, knn_model_path, ann_model_path]:
   this_path = Path(file_path)
@@ -52,34 +52,34 @@ with open(f"{model_path}/lime_explainer.pkl", 'rb') as file:
 with open(f"{model_path}/pipeline-documentation.md", 'r', encoding='utf-8') as file:
     pipe_md_content = file.read()
 """
-import library
+
 # need to import these transformers directly to load final_fully_fitted_transformer.pkl
-from library import CustomMappingTransformer, CustomTargetTransformer, CustomKNNTransformer, CustomTukeyTransformer, CustomRobustTransformer
+from mlops.mlops_library.library import CustomMappingTransformer, CustomTargetTransformer, CustomKNNTransformer, CustomTukeyTransformer, CustomRobustTransformer
 
-if __name__ == '__main__':
-    lgb_model = joblib.load(lgb_model_path)
-    logreg_model = joblib.load(logreg_model_path)
-    knn_model = joblib.load(knn_model_path)
+#if __name__ == '__main__':
+lgb_model = joblib.load(lgb_model_path)
+logreg_model = joblib.load(logreg_model_path)
+knn_model = joblib.load(knn_model_path)
 
-    print("past keras loading", flush=True)
-    ann_model = tf.keras.models.load_model(ann_model_path, custom_objects={'LeakyReLU': tf.keras.layers.LeakyReLU()})
-    logreg_thresholds = pd.read_csv(f'logreg_thresholds.csv').round(2)
-    knn_thresholds = pd.read_csv(f'knn_thresholds.csv').round(2)
-    lgb_thresholds = pd.read_csv(f'lgb_thresholds.csv').round(2)
-    ann_thresholds = pd.read_csv(f'ann_thresholds.csv').round(2)
-    print("done reading cvs - loading debug", flush=True)
-    # Load fitted transformer
-    
-    #with open(f"final_fully_fitted_pipeline.pkl", 'rb') as file: # trouble maker but use joblib
-    #    fitted_transformer = joblib.load(file)
+print("past keras loading", flush=True)
+ann_model = tf.keras.models.load_model(ann_model_path, custom_objects={'LeakyReLU': tf.keras.layers.LeakyReLU()})
+logreg_thresholds = pd.read_csv(f'{model_path}/logreg_thresholds.csv').round(2)
+knn_thresholds = pd.read_csv(f'{model_path}/knn_thresholds.csv').round(2)
+lgb_thresholds = pd.read_csv(f'{model_path}/lgb_thresholds.csv').round(2)
+ann_thresholds = pd.read_csv(f'{model_path}/ann_thresholds.csv').round(2)
+print("done reading cvs - loading debug", flush=True)
+# Load fitted transformer
 
-    with open(f"final_fully_fitted_pipeline.pkl", 'rb') as file: # trouble maker
-        fitted_transformer = joblib.load(file)
-    with open(f"lime_explainer.pkl", 'rb') as file:
-        lime_explainer = dill.load(file)
+#with open(f"final_fully_fitted_pipeline.pkl", 'rb') as file: # trouble maker but use joblib
+#    fitted_transformer = joblib.load(file)
 
-    with open(f"pipeline-documentation.md", 'r', encoding='utf-8') as file:
-        pipe_md_content = file.read()
+with open(f"{model_path}/final_fully_fitted_pipeline_new.pkl", 'rb') as file: # trouble maker
+    fitted_transformer = joblib.load(file)
+with open(f"{model_path}/lime_explainer.pkl", 'rb') as file:
+    lime_explainer = dill.load(file)
+
+with open(f"{model_path}/pipeline-documentation.md", 'r', encoding='utf-8') as file:
+    pipe_md_content = file.read()
 
 
 config = get_dataset_config()
@@ -117,6 +117,53 @@ def get_prediction(row):
 
   return [yhat_lgb, yhat_knn, yhat_logreg, yhat_ann]
 
+
+def handle_data(columns, fitted_transformer, config, column_order):
+    """
+    Process form data using the dataset configuration.
+
+    Parameters:
+    -----------
+    columns : dict
+        Dictionary containing form field values, with field names as keys
+    fitted_transformer : Pipeline
+        Fitted sklearn Pipeline for transforming the input data
+    config : dict
+        Dataset configuration from get_dataset_config()
+
+    Returns:
+    --------
+    tuple
+        (transformed_row, yhat_lgb, yhat_knn, yhat_logreg, yhat_ann)
+    """
+    startime = datetime.datetime.now()
+    # Create DataFrame with columns in the expected order
+    row_df = pd.DataFrame(columns=column_order)
+    row_df.loc[0] = np.nan  # Add blank row
+    # Process form values and fill the DataFrame
+    for field_id, field_config in config.items():
+        form_field = field_config["form_field"]
+        column_name = field_config["column_name"]
+
+        if form_field in columns and column_name in row_df.columns:
+            # Apply the field's processing function and assign to the correct column
+            processed_value = field_config["process"](columns[form_field])
+            row_df.loc[0, column_name] = processed_value
+
+    # Run pipeline
+    row_transformed = fitted_transformer.transform(row_df)
+
+    # Grab added row
+    new_row = row_transformed.loc[0].to_list()
+    new_row = np.array(new_row)
+    new_row = np.reshape(new_row, (1,-1)) if len(new_row.shape)==1 else new_row
+
+    # Get predictions
+    yhat_lgb, yhat_knn, yhat_logreg, yhat_ann = get_prediction(new_row)
+    end_time = datetime.datetime.now()
+    print("loading debug - handling data took " + str(end_time - startime))
+    return new_row, yhat_lgb, yhat_knn, yhat_logreg, yhat_ann
+
 def get_initial_page():
   return create_page(fpage, lgb='', knn='', logreg='', ann='', ensemble='', row_data='',
                           lgb_lime_table='',
@@ -124,7 +171,7 @@ def get_initial_page():
                            knn_lime_table = '',
                            ann_lime_table = '')
 
-"""
+
 def get_data(form_data):
   #get predictions
   def ann_proba(rows):
@@ -184,4 +231,3 @@ def get_data(form_data):
                            ann_lime_table = ann_lime_table
                            )
 
-"""
