@@ -3,7 +3,7 @@
 ## Pipeline Overview
 This pipeline preprocesses the loan application dataset to prepare it for machine learning modeling. It handles categorical encoding, outlier detection and treatment, and feature scaling.
 
-<img src='https://github.com/CharlieHudson31/MLOPS/blob/main/loan_application_data_transformer_pipeline.png?raw=true' width='70%' alt='Pipeline Diagram'>
+<img src='https://github.com/CharlieHudson31/Portfolio/blob/main/mlops/loan_application_data_transformer_pipeline.png?raw=true' width='70%' alt='Pipeline Diagram'>
 
 ## Step-by-Step Design Choices
 
