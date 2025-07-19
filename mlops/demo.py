@@ -18,7 +18,7 @@ from pathlib import Path
 import traceback
 import eli5
 from eli5.sklearn import explain_prediction
-
+import shap
 BASE_DIR = Path(__file__).resolve().parent
 feature_names = ['person_age', 'person_gender', 'person_education', 'person_income', 'person_emp_exp', 'person_home_ownership', 'loan_amnt', 'loan_intent', 'loan_int_rate', 'loan_percent_income', 'cb_person_cred_hist_length', 'credit_score','previous_loan_defaults_on_file']
 model_path = "mlops"
@@ -36,7 +36,7 @@ for file_path in [lgb_model_path, logreg_model_path, knn_model_path, ann_model_p
   assert this_path.exists()
 import mlops.mlops_library.library
 # need to import these transformers directly to load final_fully_fitted_transformer.pkl
-from mlops.mlops_library.library import CustomMappingTransformer, CustomTargetTransformer, CustomKNNTransformer, CustomTukeyTransformer, CustomRobustTransformer
+from mlops.mlops_library.library import CustomMappingTransformer, CustomTargetTransformer, CustomKNNTransformer, CustomTukeyTransformer, CustomRobustTransformer, dataset_setup
 from flask import jsonify
 #if __name__ == '__main__':
 lgb_model = None
@@ -48,14 +48,15 @@ fitted_transformer = None
 logreg_thresholds = None
 knn_thresholds = None
 ann_thresholds = None
-lime_explainer = None
+model_explainer = None
 pipe_md_content = None
 lgb_thresholds = None
 config = None
 fpage = None
+sample_data = None
 def load_models():
-  global lgb_model, logreg_model, knn_model, ann_model, fitted_transformer, lime_explainer, pipe_md_content, ann_thresholds, knn_thresholds, lgb_thresholds, logreg_thresholds, config, fpage
-  if lgb_model and logreg_model and knn_model and ann_model and fitted_transformer and lime_explainer and pipe_md_content and logreg_thresholds is not None:
+  global lgb_model, logreg_model, knn_model, ann_model, fitted_transformer, model_explainer, pipe_md_content, ann_thresholds, knn_thresholds, lgb_thresholds, logreg_thresholds, config, fpage, sample_data
+  if lgb_model and logreg_model and knn_model and ann_model and fitted_transformer and model_explainer and pipe_md_content and logreg_thresholds is not None:
         # Already loaded
         return
 
@@ -87,10 +88,10 @@ def load_models():
       with open(f"{model_path}/final_fully_fitted_pipeline_new.pkl", 'rb') as file:
           fitted_transformer = joblib.load(file)
 
-  # Load LIME explainer
-  if not lime_explainer:
-      with open(f"{model_path}/lime_explainer.pkl", 'rb') as file:
-          lime_explainer = dill.load(file)
+  # Load model explainer
+  if not model_explainer:
+      with open(f"{model_path}/model_explainer.pkl", 'rb') as file:
+          model_explainer = dill.load(file)
 
   # Load pipeline documentation
   if not pipe_md_content:
@@ -114,6 +115,25 @@ def load_models():
   ann_table = ann_thresholds.to_html(index=False, justify='center').replace('<td>', '<td style="text-align: center;">')
   print("loading debug - got all tables", flush=True)
 
+  url = 'https://raw.githubusercontent.com/CharlieHudson31/MLOPS/refs/heads/main/datasets/loan_data.csv'  #trimmed version
+
+  applicant_data_trimmed = pd.read_csv(url)
+  len(applicant_data_trimmed)
+  target = 'loan_status'
+  N = 5000
+  downsample_df = applicant_data_trimmed.groupby(target, group_keys=False).apply(lambda x: x.sample(int(np.rint(N*len(x)/len(applicant_data_trimmed))))).sample(frac=1).reset_index(drop=True)
+  len(downsample_df)
+  applicant_features = downsample_df.drop(columns=target)
+  labels = downsample_df[target].to_list()
+  target = 'loan_status'
+  label_column = target #change to name of your label column
+
+  with open(f"{model_path}/final_fully_fitted_pipeline_new.pkl", 'rb') as file:
+      fitted_transformer = joblib.load(file)
+  loan_applcation_rs = 176
+  x_train,  x_test, y_train,  y_test = dataset_setup(downsample_df, label_column,fitted_transformer, rs=loan_applcation_rs)
+  sample_data = shap.sample(x_train, 100)
+ 
   # Render front page
   if not fpage:
       page_template = get_fpage_template()
@@ -207,10 +227,10 @@ def handle_data(columns, fitted_transformer, config, column_order):
 
 def get_initial_page():
   return create_page(fpage, lgb='', knn='', logreg='', ann='', ensemble='', row_data='',
-                          lgb_lime_table='',
-                           logreg_lime_table = '',
-                           knn_lime_table = '',
-                           ann_lime_table = '')
+                          lgb_explainer_table='',
+                           logreg_explainer_table = '',
+                           knn_explainer_table = '',
+                           ann_explainer_table = '')
 
 
 def get_data(form_data):
@@ -228,16 +248,54 @@ def get_data(form_data):
   ann = np.round(yhat_ann[0], 2)
   ensemble = np.round(ensemble, 2)
   
-  #handle lime stuff
-  lgb_lime_table = ''
-  logreg_lime_table = ''
-  knn_lime_table = ''
-  ann_lime_table = ''
 
-  named_row_df = pd.DataFrame([new_row[0]], columns=feature_names)
-  explanation = eli5.explain_prediction(logreg_model, named_row_df.iloc[0])
-  logreg_lime_table = eli5.format_as_html(explanation)
-  print("table as html:", logreg_lime_table, flush=True)
+  lgb_explainer_table = ''
+  logreg_explainer_table = ''
+  knn_explainer_table = ''
+  ann_explainer_table = ''
+
+  if model_explainer:
+    named_row_df = pd.DataFrame([new_row[0]], columns=feature_names)
+
+    logreg_explanation = eli5.explain_prediction(logreg_model, named_row_df.iloc[0])
+    logreg_explainer_table = eli5.format_as_html(logreg_explanation)
+
+    lgb_explanation = eli5.explain_prediction(lgb_model, named_row_df.iloc[0])
+    lgb_explainer_table = eli5.format_as_html(lgb_explanation)
+
+    knn_explainer = shap.KernelExplainer(knn_model.predict_proba, sample_data)
+    class_is_true_idx = 1
+    knn_shap_values = knn_explainer.shap_values(new_row)
+    knn_shap_values_single = knn_shap_values[0, :, class_is_true_idx]
+    # Create a DataFrame
+    knn_shap_df = pd.DataFrame({
+        "Feature": feature_names,
+        "Value": new_row[0],
+        "SHAP Value": knn_shap_values_single
+    })
+    # Convert to HTML
+    knn_explainer_table = knn_shap_df.to_html(index=False)
+
+    ann_explainer = shap.KernelExplainer(ann_proba, sample_data)
+    ann_shap_values = ann_explainer.shap_values(new_row)
+    ann_shap_values_single = ann_shap_values[0, :, class_is_true_idx]
+    ann_shap_df = pd.DataFrame({
+    "Feature": feature_names,
+    "Value": new_row[0],
+    "SHAP Value": ann_shap_values_single
+    })
+
+    # Convert to HTML
+    ann_explainer_table = ann_shap_df.to_html(index=False)
+    #knn_explainer_table = knn_explainer_table_plot.html()
+    #knn_html = shap.plots.force(shap_values[0], matplotlib=False)
+    #knn_explanation = eli5.explain_prediction(knn_model, named_row_df.iloc[0])
+    #knn_explainer_table = eli5.format_as_html(knn_explanation)
+
+    #ann_explanation = eli5.explain_prediction(ann_model, named_row_df.iloc[0])
+    #ann_explainer_table = eli5.format_as_html(ann_explanation)
+
+
   """
   if lime_explainer:
     print("LIME error:", traceback.format_exc(), flush=True)
@@ -275,9 +333,8 @@ def get_data(form_data):
   #fill in fpage with results from models and Lime
   """
   return create_page(fpage, lgb=lgb, knn=knn, logreg=logreg, ann=ann, ensemble=ensemble, row_data=str(form_data.to_dict()),
-                           lgb_lime_table=lgb_lime_table,
-                           logreg_lime_table = logreg_lime_table,
-                           knn_lime_table = knn_lime_table,
-                           ann_lime_table = ann_lime_table
+                           lgb_explainer_table=lgb_explainer_table,
+                           logreg_explainer_table = logreg_explainer_table,
+                           knn_explainer_table = knn_explainer_table,
+                           ann_explainer_table = ann_explainer_table
                            )
-

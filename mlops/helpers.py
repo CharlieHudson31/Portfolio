@@ -4,14 +4,6 @@ import datetime
 import numpy as np
 
 
-#Helper function to build dataframe for Lime results - use as is
-def create_lime_table(the_explainer):
-  the_probs = the_explainer.predict_proba.round(2)
-  the_list = the_explainer.as_list()
-  df = pd.DataFrame(columns=['Condition', 'Probs', "Contribution"])
-  for i,row in enumerate(the_list):
-    df.loc[i] = [row[0],the_probs,row[1]]
-  return df
 
 def get_dataset_config():
   """
@@ -1078,7 +1070,7 @@ def get_threshold_tables_section():
     Generate HTML for the threshold tables section.
 
     This function creates the table containers for all model results.
-    Each model has two tables: a threshold table and a LIME explanation table.
+    Each model has two tables: a threshold table and a eli5 explanation table.
     By default, all tables are hidden and will only be shown when their
     corresponding button is clicked.
 
@@ -1097,8 +1089,8 @@ def get_threshold_tables_section():
         %lgb_table%
       </div>
       <div class="table2">
-      <center><h2>LGB Lime Explanation</h2></center>
-        %lgb_lime_table%
+      <center><h2>LGB eli5 Explanation</h2></center>
+        %lgb_explainer_table%
       </div>
     </div>
 
@@ -1109,8 +1101,8 @@ def get_threshold_tables_section():
         %knn_table%
       </div>
       <div class="table2">
-      <center><h2>KNN Lime Explanation</h2></center>
-        %knn_lime_table%
+      <center><h2>KNN Shap Explanation</h2></center>
+        %knn_explainer_table%
       </div>
     </div>
 
@@ -1121,8 +1113,8 @@ def get_threshold_tables_section():
         %logreg_table%
       </div>
       <div class="table2">
-      <center><h2>Logistic Regression Lime Explanation</h2></center>
-        %logreg_lime_table%
+      <center><h2>Logistic Regression eli5 Explanation</h2></center>
+        %logreg_explainer_table%
       </div>
     </div>
 
@@ -1133,8 +1125,8 @@ def get_threshold_tables_section():
         %ann_table%
       </div>
       <div class="table2">
-      <center><h2>ANN Lime Explanation</h2></center>
-        %ann_lime_table%
+      <center><h2>ANN Shap Explanation</h2></center>
+        %ann_explainer_table%
       </div>
     </div>
     '''
@@ -1219,7 +1211,7 @@ def complete_form(config, form_id="row_info", action="titanic_demo/data", method
     <form id="{form_id}" action="{action}" method="{method}">
         <input type='hidden' id='hidden1' value='hidden value'/>
         {''.join(form_elements)}
-        {submit_button("Evaluate")}
+        {submit_button("Evaluate")}<span>(~30 seconds)</span>
     </form>
     '''
 
