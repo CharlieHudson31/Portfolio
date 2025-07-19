@@ -232,8 +232,8 @@ def get_data(form_data):
   ann_lime_table = ''
 
 
-  """
-  if lime_explainer:
+
+  if not lime_explainer:
     try:
       logreg_explanation = lime_explainer.explain_instance(new_row[0], logreg_model.predict_proba, num_features=len(feature_names))
       lime_df = create_lime_table(logreg_explanation)
@@ -242,7 +242,7 @@ def get_data(form_data):
       print("LIME error:", traceback.format_exc(), flush=True)
       logreg_lime_table = f"Error generating LogReg LIME: {e}"
       pass
-    
+    """
     try:
       lgb_explanation = lime_explainer.explain_instance(new_row[0], lgb_model.predict_proba, num_features=len(feature_names))
       lime_df = create_lime_table(lgb_explanation)
