@@ -16,6 +16,9 @@ from mlops.helpers import *
 import numpy as np
 from pathlib import Path
 import traceback
+import eli5
+from eli5.sklearn import explain_prediction
+
 BASE_DIR = Path(__file__).resolve().parent
 feature_names = ['person_age', 'person_gender', 'person_education', 'person_income', 'person_emp_exp', 'person_home_ownership', 'loan_amnt', 'loan_intent', 'loan_int_rate', 'loan_percent_income', 'cb_person_cred_hist_length', 'credit_score','previous_loan_defaults_on_file']
 model_path = "mlops"
@@ -231,9 +234,13 @@ def get_data(form_data):
   knn_lime_table = ''
   ann_lime_table = ''
 
-
-
-  if not lime_explainer:
+  named_row_df = pd.DataFrame([new_row[0]], columns=feature_names)
+  explanation = eli5.explain_prediction(logreg_model, named_row_df.iloc[0])
+  logreg_lime_table = eli5.format_as_html(explanation)
+  print("table as html:", logreg_lime_table, flush=True)
+  """
+  if lime_explainer:
+    print("LIME error:", traceback.format_exc(), flush=True)
     try:
       logreg_explanation = lime_explainer.explain_instance(new_row[0], logreg_model.predict_proba, num_features=len(feature_names))
       lime_df = create_lime_table(logreg_explanation)
@@ -242,7 +249,7 @@ def get_data(form_data):
       print("LIME error:", traceback.format_exc(), flush=True)
       logreg_lime_table = f"Error generating LogReg LIME: {e}"
       pass
-    """
+    
     try:
       lgb_explanation = lime_explainer.explain_instance(new_row[0], lgb_model.predict_proba, num_features=len(feature_names))
       lime_df = create_lime_table(lgb_explanation)
