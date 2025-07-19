@@ -115,9 +115,9 @@ def load_models():
   ann_table = ann_thresholds.to_html(index=False, justify='center').replace('<td>', '<td style="text-align: center;">')
   print("loading debug - got all tables", flush=True)
 
-  url = 'https://raw.githubusercontent.com/CharlieHudson31/MLOPS/refs/heads/main/datasets/loan_data.csv'  #trimmed version
+  dataset_path = f"{model_path}/loan_data.csv"
 
-  applicant_data_trimmed = pd.read_csv(url)
+  applicant_data_trimmed = pd.read_csv(dataset_path)
   len(applicant_data_trimmed)
   target = 'loan_status'
   N = 5000
@@ -287,51 +287,7 @@ def get_data(form_data):
 
     # Convert to HTML
     ann_explainer_table = ann_shap_df.to_html(index=False)
-    #knn_explainer_table = knn_explainer_table_plot.html()
-    #knn_html = shap.plots.force(shap_values[0], matplotlib=False)
-    #knn_explanation = eli5.explain_prediction(knn_model, named_row_df.iloc[0])
-    #knn_explainer_table = eli5.format_as_html(knn_explanation)
 
-    #ann_explanation = eli5.explain_prediction(ann_model, named_row_df.iloc[0])
-    #ann_explainer_table = eli5.format_as_html(ann_explanation)
-
-
-  """
-  if lime_explainer:
-    print("LIME error:", traceback.format_exc(), flush=True)
-    try:
-      logreg_explanation = lime_explainer.explain_instance(new_row[0], logreg_model.predict_proba, num_features=len(feature_names))
-      lime_df = create_lime_table(logreg_explanation)
-      logreg_lime_table = lime_df.to_html(index=False, justify='center').replace('<td>','<td style="text-align: center;">')
-    except Exception as e:
-      print("LIME error:", traceback.format_exc(), flush=True)
-      logreg_lime_table = f"Error generating LogReg LIME: {e}"
-      pass
-    
-    try:
-      lgb_explanation = lime_explainer.explain_instance(new_row[0], lgb_model.predict_proba, num_features=len(feature_names))
-      lime_df = create_lime_table(lgb_explanation)
-      lgb_lime_table = lime_df.to_html(index=False, justify='center').replace('<td>', '<td style="text-align: center;">')
-    except Exception as e:
-      lgb_lime_table = f"Error generating LGB LIME: {e}"
-      pass
-    try:
-      knn_explanation = lime_explainer.explain_instance(new_row[0], knn_model.predict_proba, num_features=len(feature_names))
-      lime_df = create_lime_table(knn_explanation)
-      knn_lime_table = lime_df.to_html(index=False, justify='center').replace('<td>', '<td style="text-align: center;">')
-    except Exception as e:
-      knn_lime_table = f"Error generating KNN LIME: {e}"
-      pass
-    try:
-      ann_explanation = lime_explainer.explain_instance(new_row[0], ann_proba, num_features=len(feature_names))
-      lime_df = create_lime_table(ann_explanation)
-      ann_lime_table = lime_df.to_html(index=False, justify='center').replace('<td>', '<td style="text-align: center;">')
-    except Exception as e:
-      ann_lime_table = f"Error generating ANN LIME: {e}"
-      pass
-  print("loading debug - got explainers", flush=True)
-  #fill in fpage with results from models and Lime
-  """
   return create_page(fpage, lgb=lgb, knn=knn, logreg=logreg, ann=ann, ensemble=ensemble, row_data=str(form_data.to_dict()),
                            lgb_explainer_table=lgb_explainer_table,
                            logreg_explainer_table = logreg_explainer_table,
