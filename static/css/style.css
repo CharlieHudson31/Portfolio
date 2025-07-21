@@ -3,17 +3,21 @@ body {
   line-height: 1.6;
   margin: 0;
   padding: 0;
-  background-color: #f9f9f9;
+  background-color: #edf2f4;
   color: #333;
 }
 
 .site-header {
   background-color: #222;
-  color: #fff;
+  color: #edf2f4;
   padding: 2rem;
   text-align: center;
 }
+.site-header a {
+  color: #edf2f4;
 
+  text-decoration: underline;  
+}
 .site-header h1 {
   margin: 0;
   font-size: 2.5rem;
@@ -22,7 +26,7 @@ body {
 .site-header p {
   font-size: 1.2rem;
   margin-top: 0.5rem;
-  color: #ccc;
+  color: #edf2f4;
 }
 
 main.portfolio {
@@ -32,7 +36,6 @@ main.portfolio {
 }
 
 .project {
-  background: white;
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -40,13 +43,13 @@ main.portfolio {
 }
 
 .project h2 {
-  color: #0073e6;
+  color: #2b2d42;
   margin-top: 0;
 }
 
 .project a {
-  color: #0073e6;
-  text-decoration: none;
+  color: #2b2d42;
+  text-decoration: underline;
 }
 
 .project a:hover {
@@ -61,13 +64,14 @@ ul {
   display: inline-block;
   margin-top: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: #0073e6;
-  color: white;
-  text-decoration: none;
   border-radius: 4px;
   transition: background-color 0.3s;
+  background-color: #8d99ae;
+  border: 2px solid #2b2d42;
+  color: #edf2f4;        /* Text color */
+  font-size: 18px; 
 }
 
 .button:hover {
-  background-color: #005bb5;
+  background-color: #edf2f4;
 }

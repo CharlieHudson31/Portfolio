@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Model for {{ dataset_name|capitalize }}</title>
+</head>
+<body>
+    <h2>Model accuracy on test set: {{ acc }}</h2>
+
+    <h2>Decisions made for {{ dataset_name|capitalize }}:</h2>
+    <pre>{{ model_text }}</pre>
+    <a href="{{ url_for('id3') }}">Back to selection</a>
+
+</body>
+</html>
