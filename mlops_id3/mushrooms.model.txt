@@ -1,0 +1,16 @@
+odor-foul = 0 :
+| gill-size-broad = 0 :
+| | odor-none = 0 :
+| | | gill-spacing-crowded = 0 : 1
+| | | gill-spacing-crowded = 1 :
+| | | | stalk-shape-enlarging = 0 : 0
+| | | | stalk-shape-enlarging = 1 : 1
+| | odor-none = 1 :
+| | | stalk-surface-below-ring-scaly = 0 :
+| | | | population-clustered = 0 : 0
+| | | | population-clustered = 1 : 1
+| | | stalk-surface-below-ring-scaly = 1 : 1
+| gill-size-broad = 1 :
+| | spore-print-color-green = 0 : 0
+| | spore-print-color-green = 1 : 1
+odor-foul = 1 : 1

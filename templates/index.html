@@ -4,25 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Charlie Hudson - Portfolio</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   <header class="site-header">
     <h1>Charlie Hudson</h1>
     <p>BS in Computer Science — University of Oregon</p>
+      <p>
+    Github:
+    <a href="https://github.com/CharlieHudson31" target="_blank">https://github.com/CharlieHudson31</a>
+    <br>
+    Gitlab:
+    <a href="https://gitlab.com/CharlieHudson31" target="_blank">https://gitlab.com/CharlieHudson31</a>
+    </p>
   </header>
 
   <main class="portfolio">
-  <p>
-  Github:
-  <a href="https://github.com/CharlieHudson31" target="_blank">https://github.com/CharlieHudson31</a>
-  Gitlab:
-  <a href="https://gitlab.com/CharlieHudson31" target="_blank">https://gitlab.com/CharlieHudson31</a>
-  </p>
+
     <section class="project">
       <h2>Bank Loan Approval Machine Learning Project Demo</h2>
       <p>This demo uses machine learning models to predict whether a bank loan will be approved.</p>
-      <a class="button" href="/titanic_demo">Try the Demo</a>
+      <a class="button" href="/bank_loan_demo">Try the Demo</a>
+    </section>
+    <section class="project">
+      <h2>ID3 (Iterative Dichotomiser 3) Machine Learning Project Demo</h2>
+      <p>A binary classification tool that builds and visualizes ID3 (Iterative Dichotomiser 3) decision trees for any dataset containing binary-valued features.</p>
+      <a class="button" href="/id3_demo">Try the Demo</a>
     </section>
 
     <section class="project">
