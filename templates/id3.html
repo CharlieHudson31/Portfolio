@@ -1,21 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>A binary classification tool that builds and visualizes ID3 (Iterative Dichotomiser 3) decision trees from datasets containing only binary-valued features.</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Select a Dataset</h1>
+    <header class="site-header">
+        <h1>ID3</h1>
+        <br>
+        <p>A binary classification tool that builds and visualizes ID3 (Iterative Dichotomiser 3) decision trees from datasets containing only binary-valued features.
+
+        </p>  
+        </header>
+    <main class="portfolio">
+    <section class="project">
+    <h2>Select a Dataset</h2>
     {% for dataset in datasets %}
+    
         <form action="{{ url_for('show_model', dataset_name=dataset) }}" method="get" style="display:inline-block; margin: 5px;">
-            <button type="submit">Train and evaluate: {{ dataset|capitalize }}</button>
+        <a>
+            <button type="submit" class="button">Train and evaluate: {{ dataset|capitalize }}</button>
+        </a> 
         </form>
 
     <!-- Button to view dataset -->
+        <a>
         <form action="{{ url_for('plot_dataset', dataset_name=dataset) }}" method="get" style="display:inline-block; margin: 5px;">
-            <button type="submit">View Dataset Feature Distribution: {{ dataset|capitalize }}</button>
+            <button type="submit" class="button">View Dataset Feature Distribution: {{ dataset|capitalize }}</button>
         </form>
+        </a>
         <br>
     {% endfor %}
+    </section>
+    <section class="project">
     <a href="{{ url_for('home') }}">Back to portfolio</a>
+    </section>
+    </main>
 </body>
 </html>
