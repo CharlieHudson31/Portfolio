@@ -1181,7 +1181,7 @@ def get_pipeline_documentation(md_content):
 
     return documentation_html
 
-def complete_form(config, form_id="row_info", action="titanic_demo/data", method="POST"):
+def complete_form(config, form_id="row_info", action="bank_loan_demo/data", method="POST"):
     """
     Generate form HTML using the dataset configuration.
     """
