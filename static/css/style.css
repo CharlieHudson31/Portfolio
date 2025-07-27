@@ -8,10 +8,22 @@ body {
 }
 
 .site-header {
+  position: relative;
   background-color: #222;
   color: #edf2f4;
   padding: 2rem;
   text-align: center;
+  overflow: hidden;
+}
+
+.corner-image {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  height: 10em;          /* Size relative to font size */
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 50%;
 }
 .site-header a {
   color: #edf2f4;
