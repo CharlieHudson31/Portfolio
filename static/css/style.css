@@ -15,7 +15,15 @@ body {
   text-align: center;
   overflow: hidden;
 }
-
+.site-footer {
+  width: 100%;
+  background-color: #222;
+  color: #edf2f4;
+  padding: 2rem;
+  margin-top: 40px;
+  display: flex;
+  justify-content: flex-end; /* aligns content to the right */
+}
 .corner-image {
   position: absolute;
   top: 1em;
